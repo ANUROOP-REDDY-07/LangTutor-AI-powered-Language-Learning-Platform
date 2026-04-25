@@ -4,8 +4,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { getLevelData } from '../utils/progression';
 
 export default function Dashboard() {
-  const { currentUser, userData, logout, theme, toggleTheme } = useAuth();
+  const [isChangingLanguage, setIsChangingLanguage] = React.useState(false);
+  const { currentUser, userData, logout, theme, toggleTheme, updateUserLanguage } = useAuth();
   const navigate = useNavigate();
+
+  const languages = [
+    'Spanish', 'French', 'German', 'Italian', 'Portuguese', 
+    'Japanese', 'Chinese', 'Korean', 'Hindi', 'Arabic', 
+    'Russian', 'Dutch', 'Turkish'
+  ];
 
   // Apply theme to body
   useEffect(() => {
@@ -18,6 +25,15 @@ export default function Dashboard() {
       navigate('/');
     } catch (error) {
       console.error("Failed to log out", error);
+    }
+  }
+
+  async function handleLanguageChange(newLang) {
+    try {
+      await updateUserLanguage(newLang);
+      setIsChangingLanguage(false);
+    } catch (error) {
+      console.error("Failed to update language", error);
     }
   }
 
@@ -43,7 +59,32 @@ export default function Dashboard() {
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '2rem', marginBottom: '2rem' }}>
             <div>
               <h2 style={{ fontSize: '2rem', margin: '0 0 0.5rem 0' }}>Welcome, {currentUser?.email?.split('@')[0]}!</h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', margin: 0 }}>Learning <strong style={{ color: 'var(--primary)' }}>{userData?.learningLanguage || userData?.targetLanguage || 'Language'}</strong></p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', margin: 0 }}>
+                  Learning <strong style={{ color: 'var(--primary)' }}>{userData?.learningLanguage || 'Language'}</strong>
+                </p>
+                {isChangingLanguage ? (
+                  <select 
+                    className="input-field" 
+                    style={{ padding: '0.25rem 0.5rem', fontSize: '0.9rem', width: 'auto' }}
+                    value={userData?.learningLanguage} 
+                    onChange={(e) => handleLanguageChange(e.target.value)}
+                    onBlur={() => setIsChangingLanguage(false)}
+                    autoFocus
+                  >
+                    {languages.map(lang => (
+                      <option key={lang} value={lang}>{lang}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <button 
+                    onClick={() => setIsChangingLanguage(true)}
+                    style={{ background: 'none', border: 'none', color: 'var(--secondary)', cursor: 'pointer', fontSize: '0.9rem', padding: '0.2rem 0.5rem', borderRadius: '4px', backgroundColor: 'rgba(59, 130, 246, 0.1)' }}
+                  >
+                    Change
+                  </button>
+                )}
+              </div>
             </div>
             <div style={{ display: 'flex', gap: '2.5rem', textAlign: 'center', flexWrap: 'wrap', alignItems: 'center' }}>
               <div className="animate-float" style={{ animationDelay: '0s' }}>

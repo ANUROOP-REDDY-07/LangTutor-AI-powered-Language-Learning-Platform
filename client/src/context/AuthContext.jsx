@@ -27,8 +27,29 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('theme', newTheme);
   };
 
-  const signup = (email, password) => {
-    return createUserWithEmailAndPassword(auth, email, password);
+  const signup = (email, password, language = 'Spanish') => {
+    return createUserWithEmailAndPassword(auth, email, password).then(async (userCredential) => {
+      const user = userCredential.user;
+      const userRef = doc(db, "users", user.uid);
+      await setDoc(userRef, {
+        xp: 0,
+        level: 'Beginner',
+        totalSessions: 0,
+        totalMinutes: 0,
+        messagesSent: 0,
+        gamesPlayed: 0,
+        learningLanguage: language,
+        currentStreak: 0,
+        lastLoginDate: new Date().toISOString().split('T')[0]
+      });
+      return userCredential;
+    });
+  };
+
+  const updateUserLanguage = async (newLanguage) => {
+    if (!currentUser) return;
+    const userRef = doc(db, "users", currentUser.uid);
+    await setDoc(userRef, { learningLanguage: newLanguage }, { merge: true });
   };
 
   const login = (email, password) => {
@@ -44,20 +65,7 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(user);
       
       if (user) {
-        // Create initial doc if it doesn't exist to ensure schema is respected
         const userRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(userRef);
-        if (!docSnap.exists()) {
-          await setDoc(userRef, {
-            xp: 0,
-            level: 'Beginner',
-            totalSessions: 0,
-            totalMinutes: 0,
-            messagesSent: 0,
-            gamesPlayed: 0,
-            learningLanguage: 'Spanish' // default
-          });
-        }
         
         // Listen for real-time updates directly
         const unsubscribeData = onSnapshot(userRef, async (snapshot) => {
@@ -82,15 +90,17 @@ export const AuthProvider = ({ children }) => {
               
               // Push the streak securely to the database so we don't spam updates
               await setDoc(userRef, { currentStreak: streak, lastLoginDate: todayDate }, { merge: true });
-              // The snapshot will trigger again with updated data, so we don't explicitly set here.
             } else {
               setUserData(data);
             }
+          } else {
+            // Document might not exist if signup hasn't finished its setDoc yet
+            // or if it was manually deleted. signup handles initial creation now.
+            setUserData(null);
           }
         });
         
         setLoading(false);
-        // Clean up the data listener on unmount or user change
         return () => unsubscribeData();
       } else {
         setUserData(null);
@@ -108,7 +118,8 @@ export const AuthProvider = ({ children }) => {
     toggleTheme,
     login,
     signup,
-    logout
+    logout,
+    updateUserLanguage
   };
 
   return (

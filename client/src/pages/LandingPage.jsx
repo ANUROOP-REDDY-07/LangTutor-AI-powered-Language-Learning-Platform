@@ -8,7 +8,14 @@ export default function LandingPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [language, setLanguage] = useState('Spanish');
   
+  const languages = [
+    'Spanish', 'French', 'German', 'Italian', 'Portuguese', 
+    'Japanese', 'Chinese', 'Korean', 'Hindi', 'Arabic', 
+    'Russian', 'Dutch', 'Turkish'
+  ];
+
   const { login, signup } = useAuth();
   const navigate = useNavigate();
 
@@ -21,7 +28,7 @@ export default function LandingPage() {
       if (isLogin) {
         await login(email, password);
       } else {
-        await signup(email, password);
+        await signup(email, password, language);
       }
       navigate('/dashboard');
     } catch (err) {
@@ -41,6 +48,21 @@ export default function LandingPage() {
         {error && <div style={{ color: 'var(--danger)', marginBottom: '1rem', padding: '0.5rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: '0.5rem' }}>{error}</div>}
         
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {!isLogin && (
+            <div>
+              <label style={{ display: 'block', textAlign: 'left', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Select Language to Learn</label>
+              <select 
+                className="input-field" 
+                value={language} 
+                onChange={(e) => setLanguage(e.target.value)}
+                required
+              >
+                {languages.map(lang => (
+                  <option key={lang} value={lang}>{lang}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <input 
               type="email" 
