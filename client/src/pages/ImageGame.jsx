@@ -5,33 +5,20 @@ import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Robust fallback vocabulary to ensure 20 unique questions and unpredictable options
-// This is used to supplement the database if it doesn't have enough words.
+// Multi-language fallback vocabulary
 const FALLBACK_VOCABULARY = [
-  { word: "Apple", translation: "Manzana", imageUrl: "https://images.unsplash.com/photo-1560806887-1e4cd0b6faa6?w=400&q=80" },
-  { word: "Dog", translation: "Perro", imageUrl: "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=400&q=80" },
-  { word: "Cat", translation: "Gato", imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&q=80" },
-  { word: "House", translation: "Casa", imageUrl: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400&q=80" },
-  { word: "Car", translation: "Coche", imageUrl: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=400&q=80" },
-  { word: "Tree", translation: "Árbol", imageUrl: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=400&q=80" },
-  { word: "Book", translation: "Libro", imageUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&q=80" },
-  { word: "Computer", translation: "Computadora", imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&q=80" },
-  { word: "Sun", translation: "Sol", imageUrl: "https://images.unsplash.com/photo-1533628635777-112b2239b1c7?w=400&q=80" },
-  { word: "Moon", translation: "Luna", imageUrl: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=400&q=80" },
-  { word: "Water", translation: "Agua", imageUrl: "https://images.unsplash.com/photo-1548883354-7622d03aca27?w=400&q=80" },
-  { word: "Fire", translation: "Fuego", imageUrl: "https://images.unsplash.com/photo-1497906539264-eb7ebce0dfb5?w=400&q=80" },
-  { word: "Earth", translation: "Tierra", imageUrl: "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=400&q=80" },
-  { word: "Bread", translation: "Pan", imageUrl: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80" },
-  { word: "Coffee", translation: "Café", imageUrl: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=400&q=80" },
-  { word: "Milk", translation: "Leche", imageUrl: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80" },
-  { word: "City", translation: "Ciudad", imageUrl: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400&q=80" },
-  { word: "Mountain", translation: "Montaña", imageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80" },
-  { word: "Beach", translation: "Playa", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80" },
-  { word: "Bird", translation: "Pájaro", imageUrl: "https://images.unsplash.com/photo-1522926193341-e9ff2e9bda5b?w=400&q=80" },
-  { word: "Flower", translation: "Flor", imageUrl: "https://images.unsplash.com/photo-1490750967868-88cb44cb2f3a?w=400&q=80" },
-  { word: "Train", translation: "Tren", imageUrl: "https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=400&q=80" },
-  { word: "Plane", translation: "Avión", imageUrl: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&q=80" },
-  { word: "Shoe", translation: "Zapato", imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" }
+  { word: "Apple", imageUrl: "https://images.unsplash.com/photo-1560806887-1e4cd0b6faa6?w=400&q=80", translations: { Spanish: "Manzana", French: "Pomme", German: "Apfel", Italian: "Mela", Portuguese: "Maçã" } },
+  { word: "Dog", imageUrl: "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=400&q=80", translations: { Spanish: "Perro", French: "Chien", German: "Hund", Italian: "Cane", Portuguese: "Cachorro" } },
+  { word: "Cat", imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&q=80", translations: { Spanish: "Gato", French: "Chat", German: "Katze", Italian: "Gatto", Portuguese: "Gato" } },
+  { word: "House", imageUrl: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400&q=80", translations: { Spanish: "Casa", French: "Maison", German: "Haus", Italian: "Casa", Portuguese: "Casa" } },
+  { word: "Car", imageUrl: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=400&q=80", translations: { Spanish: "Coche", French: "Voiture", German: "Auto", Italian: "Auto", Portuguese: "Carro" } },
+  { word: "Tree", imageUrl: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=400&q=80", translations: { Spanish: "Árbol", French: "Arbre", German: "Baum", Italian: "Albero", Portuguese: "Árvore" } },
+  { word: "Book", imageUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&q=80", translations: { Spanish: "Libro", French: "Livre", German: "Buch", Italian: "Libro", Portuguese: "Livro" } },
+  { word: "Sun", imageUrl: "https://images.unsplash.com/photo-1533628635777-112b2239b1c7?w=400&q=80", translations: { Spanish: "Sol", French: "Soleil", German: "Sonne", Italian: "Sole", Portuguese: "Sol" } },
+  { word: "Water", imageUrl: "https://images.unsplash.com/photo-1548883354-7622d03aca27?w=400&q=80", translations: { Spanish: "Agua", French: "Eau", German: "Wasser", Italian: "Acqua", Portuguese: "Água" } },
+  { word: "Bread", imageUrl: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80", translations: { Spanish: "Pan", French: "Pain", German: "Brot", Italian: "Pane", Portuguese: "Pão" } },
+  { word: "Coffee", imageUrl: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=400&q=80", translations: { Spanish: "Café", French: "Café", German: "Kaffee", Italian: "Caffè", Portuguese: "Café" } },
+  { word: "Milk", imageUrl: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80", translations: { Spanish: "Leche", French: "Lait", German: "Milch", Italian: "Latte", Portuguese: "Leite" } }
 ];
 
 export default function ImageGame() {
@@ -49,34 +36,50 @@ export default function ImageGame() {
 
   useEffect(() => {
     const initGame = async () => {
+      if (!userData) return; // Wait for auth to load
+      
       try {
+        setLoading(true);
+        const lang = userData.learningLanguage || 'Spanish';
         let dbWords = [];
+        
         try {
-          const deckRef = doc(db, 'vocabularyDecks', 'basic_objects');
+          // Try to fetch language-specific deck
+          const deckRef = doc(db, 'vocabularyDecks', `basic_objects_${lang}`);
           const snap = await getDoc(deckRef);
           if (snap.exists() && snap.data().words) {
             dbWords = snap.data().words;
+          } else {
+            // Fallback to default deck
+            const defaultRef = doc(db, 'vocabularyDecks', 'basic_objects');
+            const defaultSnap = await getDoc(defaultRef);
+            if (defaultSnap.exists() && defaultSnap.data().words) {
+              dbWords = defaultSnap.data().words;
+            }
           }
         } catch (e) {
           console.error("Firestore read error, using fallback:", e);
         }
 
-        // Combine DB words with fallback to ensure a large pool
-        const combinedPool = [...dbWords, ...FALLBACK_VOCABULARY].filter((v, i, a) => a.findIndex(t => (t.word === v.word)) === i); // Unique words
+        // Map fallback vocabulary to the correct language
+        const mappedFallback = FALLBACK_VOCABULARY.map(v => ({
+          word: v.word,
+          imageUrl: v.imageUrl,
+          translation: v.translations[lang] || v.translations['Spanish'] || v.word
+        }));
+
+        // Combine DB words with fallback
+        const combinedPool = [...dbWords, ...mappedFallback].filter((v, i, a) => a.findIndex(t => (t.word === v.word)) === i);
         
-        // Target 20 questions
-        const totalQuestions = 20;
+        const totalQuestions = Math.min(20, combinedPool.length);
         let selectedQuestions = [];
         
-        // Randomly sample 20 questions (with replacement if pool is smaller than 20)
-        for (let i = 0; i < totalQuestions; i++) {
-          const randomTarget = combinedPool[Math.floor(Math.random() * combinedPool.length)];
-          selectedQuestions.push(randomTarget);
-        }
+        // Randomly sample questions
+        const shuffledPool = [...combinedPool].sort(() => 0.5 - Math.random());
+        selectedQuestions = shuffledPool.slice(0, totalQuestions);
 
-        // Format questions with 3 unique distractors each
+        // Format questions
         const formatted = selectedQuestions.map((w, idx) => {
-          // Get distractors that are NOT the correct word
           const possibleDistractors = combinedPool.filter(ow => ow.word !== w.word);
           const shuffledDistractors = possibleDistractors.sort(() => 0.5 - Math.random()).slice(0, 3);
           
@@ -91,6 +94,10 @@ export default function ImageGame() {
         });
         
         setQuestions(formatted);
+        setCurrentQuestionIndex(0);
+        setScore(0);
+        setMistakes(0);
+        setStreak(0);
         
         // Preload first few images
         formatted.slice(0, 5).forEach(q => {
@@ -104,7 +111,7 @@ export default function ImageGame() {
       }
     };
     initGame();
-  }, []);
+  }, [userData?.learningLanguage, userData?.uid]);
 
   useEffect(() => {
     setImageLoaded(false);
