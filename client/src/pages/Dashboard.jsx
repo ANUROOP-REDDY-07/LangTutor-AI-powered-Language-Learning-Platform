@@ -24,7 +24,10 @@ export default function Dashboard() {
   return (
     <div className="page-container animate-fade-in">
       <header className="page-header">
-        <h1 className="text-gradient">Dashboard</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <img src="/logo.png" alt="Logo" style={{ height: '40px' }} />
+          <h1 className="text-gradient" style={{ margin: 0 }}>Dashboard</h1>
+        </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <button onClick={toggleTheme} className="btn btn-secondary">
             {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}

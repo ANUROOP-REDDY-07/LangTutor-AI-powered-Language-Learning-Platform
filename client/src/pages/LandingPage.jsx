@@ -33,7 +33,7 @@ export default function LandingPage() {
   return (
     <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="glass-card animate-fade-in" style={{ width: '100%', maxWidth: '450px', textAlign: 'center' }}>
-        <h1 className="text-gradient animate-float" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>LangTutor</h1>
+        <img src="/logo.png" alt="LangTutor Logo" style={{ width: '180px', marginBottom: '1.5rem' }} className="animate-float" />
         <h2 style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
           {isLogin ? 'Welcome Back' : 'Create an Account'}
         </h2>

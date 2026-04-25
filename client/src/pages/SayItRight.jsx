@@ -226,7 +226,8 @@ export default function SayItRight() {
         <header style={themeStyles[theme].header}>
           <Link to="/dashboard" style={styles.backLink}><ArrowLeft size={16}/> Back to Dashboard</Link>
         </header>
-        <div style={{ textAlign: 'center', margin: '2rem 0' }}>
+        <div style={{ textAlign: 'center', margin: '2rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <img src="/logo.png" alt="Logo" style={{ height: '60px', marginBottom: '1rem' }} />
           <h1 style={{ fontSize: '3rem', margin: 0, color: '#f59e0b' }}>SayIt Right 🗣️</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', marginTop: '0.5rem' }}>The Voice Translation Game</p>
         </div>

@@ -267,7 +267,8 @@ export default function RoleplayArena() {
         <header style={themeStyles[theme].header}>
           <Link to="/dashboard" style={styles.backLink}><ArrowLeft size={16}/> Back to Dashboard</Link>
         </header>
-        <div style={{ textAlign: 'center', margin: '2rem 0' }}>
+        <div style={{ textAlign: 'center', margin: '2rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <img src="/logo.png" alt="Logo" style={{ height: '60px', marginBottom: '1rem' }} />
           <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', background: 'linear-gradient(to right, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Roleplay Arena</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Immerse yourself in real-life voice conversations.</p>
         </div>
